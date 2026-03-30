@@ -1,18 +1,18 @@
 # Silode
 
-A local LLM runner for **MacBooks**, built as a lightweight Ollama-style API server on top of the **MLX** ecosystem.
+Silode is a **Mac-first local AI app** inspired by Ollama, designed around a clean desktop UX and the **MLX** ecosystem for Apple Silicon.
 
-## What this workspace includes
+## Highlights
 
-- FastAPI server with `/api/health`, `/api/tags`, and `/api/generate`
-- MLX-backed inference path for Apple Silicon
-- Graceful stub mode before a model is installed
-- Simple CLI for serving and one-shot prompting
-- Smoke tests for the API surface
+- FastAPI backend with `/api/health`, `/api/status`, `/api/tags`, `/api/generate`, and `/api/chat`
+- Polished browser-based desktop UI with a clean macOS-inspired layout
+- Native desktop launcher via `pywebview`
+- Graceful stub fallback while MLX models are still downloading or unavailable
+- Smoke-tested API and UI routes
 
 ## Quick start
 
-1. Create a virtual environment:
+1. Create and activate a virtual environment:
 
    ```bash
    python3 -m venv .venv
@@ -25,48 +25,72 @@ A local LLM runner for **MacBooks**, built as a lightweight Ollama-style API ser
    pip install -r requirements.txt
    ```
 
-3. Copy the example environment file:
+3. Copy the environment template:
 
    ```bash
    cp .env.example .env
    ```
 
-4. Start the local server:
+4. Run the local server:
 
    ```bash
    python run.py serve --reload
    ```
 
-The server defaults to `http://127.0.0.1:11435`.
+5. Open the app in your browser:
+
+   ```bash
+   open http://127.0.0.1:11435
+   ```
+
+## Native macOS desktop mode
+
+Launch the desktop window directly:
+
+```bash
+python run.py desktop
+```
+
+Build a distributable macOS app bundle:
+
+```bash
+./scripts/build_macos_app.sh
+```
+
+This creates:
+
+```text
+dist/Silode.app
+```
 
 ## API examples
 
-### Health check
+### Health
 
 ```bash
 curl http://127.0.0.1:11435/api/health
 ```
 
-### List available models
+### Status
 
 ```bash
-curl http://127.0.0.1:11435/api/tags
+curl http://127.0.0.1:11435/api/status
 ```
 
-### Generate text
+### Chat
 
 ```bash
-curl -X POST http://127.0.0.1:11435/api/generate \
+curl -X POST http://127.0.0.1:11435/api/chat \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "mlx-community/Llama-3.2-3B-Instruct-4bit",
-    "prompt": "Write a two-line haiku about MacBooks.",
-    "stream": false
+    "messages": [
+      {"role": "user", "content": "Give me a crisp product pitch for Silode."}
+    ]
   }'
 ```
 
 ## Notes
 
-- This is an **MVP starter** for a Mac-optimized local runtime, not a full Ollama replacement yet.
-- For best performance, run on Apple Silicon and use quantized MLX-compatible models.
-- If `mlx-lm` is not installed or a model is unavailable, the app falls back to a stub response so the workspace still boots cleanly.
+- Best results come from Apple Silicon with MLX-compatible quantized models.
+- Until a model is cached and ready, Silode falls back to a stub response so the UI and app shell remain usable.
+- This is now a stronger product-style prototype, ready for continued iteration into a fuller macOS assistant.

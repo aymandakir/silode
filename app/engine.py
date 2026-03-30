@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Optional, Sequence
 
 from app.config import get_settings
 
@@ -20,13 +21,17 @@ class GenerationResult:
 
 class LocalEngine:
     def __init__(self) -> None:
-        self._loaded_model_name: str | None = None
+        self._loaded_model_name: Optional[str] = None
         self._model = None
         self._tokenizer = None
 
     @property
+    def is_available(self) -> bool:
+        return bool(mlx_generate and mlx_load)
+
+    @property
     def backend_name(self) -> str:
-        return "mlx" if mlx_generate and mlx_load else "stub"
+        return "mlx" if self.is_available else "stub"
 
     def list_models(self) -> list[str]:
         settings = get_settings()
@@ -46,13 +51,33 @@ class LocalEngine:
         self._model, self._tokenizer = mlx_load(model_name)
         self._loaded_model_name = model_name
 
+    def _build_chat_prompt(
+        self,
+        *,
+        messages: Sequence[dict[str, str]],
+        system_prompt: Optional[str] = None,
+    ) -> str:
+        settings = get_settings()
+        prompt_blocks = [
+            f"System:\n{(system_prompt or settings.system_prompt).strip()}",
+        ]
+
+        for item in messages:
+            role = item.get("role", "user").strip().title()
+            content = item.get("content", "").strip()
+            if content:
+                prompt_blocks.append(f"{role}:\n{content}")
+
+        prompt_blocks.append("Assistant:\n")
+        return "\n\n".join(prompt_blocks)
+
     def generate(
         self,
         *,
         model_name: str,
         prompt: str,
-        max_tokens: int | None = None,
-        temperature: float | None = None,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
     ) -> GenerationResult:
         settings = get_settings()
         preview = prompt.strip().replace("\n", " ")[:200]
@@ -63,9 +88,7 @@ class LocalEngine:
                     text=f"[stub:{model_name}] MLX is not active yet. Prompt received: {preview}",
                     backend="stub",
                 )
-            raise RuntimeError(
-                "MLX runtime is unavailable and stub mode is disabled."
-            )
+            raise RuntimeError("MLX runtime is unavailable and stub mode is disabled.")
 
         try:
             self._ensure_model(model_name)
@@ -88,6 +111,26 @@ class LocalEngine:
                     backend="stub",
                 )
             raise
+
+    def chat(
+        self,
+        *,
+        model_name: str,
+        messages: Sequence[dict[str, str]],
+        system_prompt: Optional[str] = None,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None,
+    ) -> GenerationResult:
+        prompt = self._build_chat_prompt(
+            messages=messages,
+            system_prompt=system_prompt,
+        )
+        return self.generate(
+            model_name=model_name,
+            prompt=prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
+        )
 
 
 engine = LocalEngine()

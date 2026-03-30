@@ -36,3 +36,36 @@ def test_generate_endpoint() -> None:
     payload = response.json()
     assert payload["done"] is True
     assert payload["response"]
+
+
+def test_status_endpoint() -> None:
+    response = client.get("/api/status")
+    assert response.status_code == 200
+
+    payload = response.json()
+    assert payload["app_name"] == "silode"
+    assert isinstance(payload["models"], list)
+    assert isinstance(payload["suggestions"], list)
+
+
+def test_chat_endpoint() -> None:
+    response = client.post(
+        "/api/chat",
+        json={
+            "messages": [
+                {"role": "user", "content": "Give me a clean one-line summary of Silode."}
+            ]
+        },
+    )
+    assert response.status_code == 200
+
+    payload = response.json()
+    assert payload["message"]["role"] == "assistant"
+    assert payload["message"]["content"]
+
+
+def test_root_serves_desktop_ui() -> None:
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    assert "Silode" in response.text

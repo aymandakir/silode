@@ -43,5 +43,13 @@ def prompt(
     typer.echo(result.text)
 
 
+@cli.command()
+def desktop() -> None:
+    """Launch the native macOS desktop window."""
+    from app.desktop import launch_desktop_app
+
+    launch_desktop_app()
+
+
 if __name__ == "__main__":
     cli()

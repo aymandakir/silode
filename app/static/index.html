@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silode</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <div class="traffic-lights" aria-hidden="true">
+            <span class="red"></span>
+            <span class="yellow"></span>
+            <span class="green"></span>
+          </div>
+          <div class="brand-block">
+            <p class="eyebrow">Mac-first local AI</p>
+            <h1>Silode</h1>
+            <p class="subtle">A clean, local assistant optimized for Apple Silicon.</p>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Runtime</h2>
+            <span id="backend-badge" class="badge">Checking…</span>
+          </div>
+          <p id="status-text" class="muted">Loading model and app status…</p>
+        </section>
+
+        <section class="panel controls">
+          <div class="field">
+            <label for="model-select">Model</label>
+            <select id="model-select"></select>
+          </div>
+
+          <div class="field">
+            <div class="field-row">
+              <label for="temperature">Temperature</label>
+              <span id="temperature-value">0.7</span>
+            </div>
+            <input id="temperature" type="range" min="0" max="1.5" step="0.1" value="0.7" />
+          </div>
+
+          <div class="field">
+            <div class="field-row">
+              <label for="max-tokens">Max tokens</label>
+              <span id="max-tokens-value">256</span>
+            </div>
+            <input id="max-tokens" type="range" min="64" max="1024" step="32" value="256" />
+          </div>
+
+          <div class="field">
+            <label for="system-prompt">System prompt</label>
+            <textarea id="system-prompt" rows="5">You are Silode, a polished local assistant for Mac users. Be concise, helpful, and practical.</textarea>
+          </div>
+        </section>
+      </aside>
+
+      <main class="main-panel">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">Desktop preview</p>
+            <h2>Fast, clean, local AI for macOS</h2>
+            <p class="subtle">Chat privately on-device, switch models, and keep the interface distraction-free.</p>
+          </div>
+          <button id="clear-chat" class="secondary-button">Clear chat</button>
+        </header>
+
+        <section class="panel prompt-panel">
+          <div class="panel-header">
+            <h3>Quick starts</h3>
+            <span class="muted">Tap to try</span>
+          </div>
+          <div id="suggestions" class="chips"></div>
+        </section>
+
+        <section id="messages" class="messages panel" aria-live="polite"></section>
+
+        <form id="composer-form" class="composer panel">
+          <label class="composer-label" for="composer">Message</label>
+          <textarea id="composer" rows="3" placeholder="Ask Silode anything about your project, writing, or ideas…"></textarea>
+          <div class="composer-actions">
+            <span id="composer-hint" class="muted">Enter to send • Shift+Enter for a new line</span>
+            <button id="send-button" type="submit">Send</button>
+          </div>
+        </form>
+      </main>
+    </div>
+
+    <script src="/assets/app.js" defer></script>
+  </body>
+</html>
