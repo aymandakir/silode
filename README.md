@@ -63,6 +63,8 @@ This creates:
 dist/Silode.app
 ```
 
+A GitHub Actions workflow at `.github/workflows/macos-app.yml` also builds and uploads a downloadable `Silode-macOS-app` artifact on each push to `main`.
+
 ## API examples
 
 ### Health
